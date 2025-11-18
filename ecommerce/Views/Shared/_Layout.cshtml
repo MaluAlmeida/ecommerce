@@ -203,7 +203,7 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
                                     <span class="dropdown-item-text">
-                                        Olá @nome@(isAdmin ? " (Admin)" : "")!
+                                        @nome@(isAdmin ? " (Admin)" : "")
                                     </span>
                                 </li>
                                 <li><hr class="dropdown-divider" /></li>
@@ -213,12 +213,8 @@
                                     <li><a class="dropdown-item" asp-controller="Produto" asp-action="Index">Produtos</a></li>
                                     <li><a class="dropdown-item" asp-controller="AdminPedido" asp-action="Index">Pedidos</a></li>
                                 }
-                                else
-                                {
-                                    <li><a class="dropdown-item" asp-controller="UsuarioPedido" asp-action="Index">Meus Pedidos</a></li>
-                                }
 
-                                <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Perfil">Perfil</a></li>
+                                <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Perfil">Meu Perfil</a></li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Logout">Sair</a></li>
                             </ul>

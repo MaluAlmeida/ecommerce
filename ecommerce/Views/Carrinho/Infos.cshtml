@@ -6,7 +6,7 @@
 }
 
 <form asp-action="FinalizarPedido" asp-controller="Carrinho" method="post" id="checkoutForm">
-  <!-- usado se o usuário escolher um endereço salvo (opcional) -->
+    @Html.AntiForgeryToken()
   <input type="hidden" name="EnderecoSelecionadoId" id="EnderecoSelecionadoId" value="" />
   <!-- usado quando escolher um cartão salvo OU após cadastrar um -->
   <input type="hidden" name="CartaoId" id="cartaoSelecionado" value="" />
@@ -69,7 +69,6 @@
           PIX
         </label>
       </div>
-      
 
     </section> 
 
@@ -172,8 +171,8 @@
   --panel:#F3E8D7;
   --ink:#2b2b2b;
   --muted:#7a6f66;
-  --card:#F6EDE0;
-  --btn:#8a5f43;
+  --card: #F7F1E6;
+  --btn: #8a5f43;
   --btn-dark:#6f4a36;
   --radius:14px;
   --shadow:0 10px 22px rgba(0,0,0,.12);

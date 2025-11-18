@@ -3,41 +3,105 @@
     ViewData["Title"] = Model.Nome;
 }
 
-<div class="container py-4">
-    <div class="row g-4 align-items-start">
-        <div class="col-md-5">
-            <div class="p-3 bg-white rounded shadow-sm">
-                <img src="@Url.Content("~/img/" + Model.Imagens?.FirstOrDefault()?.Url)"
-                     alt="@Model.Nome" class="img-fluid" />
-            </div>
-        </div>
-
-        <div class="col-md-7">
-            <div class="p-3 bg-light rounded shadow-sm">
-                <h3 class="text-center mb-3" style="font-family:'Cinzel',serif;">
-                    @Model.Nome
-                </h3>
-                <p class="small text-muted" style="text-align:justify;">
-                    @Model.Descricao
-                </p>
-            </div>
-
-            <h4 class="mt-3 fw-bold">R$ @Model.Preco.ToString("N2")</h4>
-
-            <form asp-controller="Carrinho"
-                  asp-action="Adicionar"
-                  method="post"
-                  asp-route-next="index"
-                  class="mt-3">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="produtoId" value="@Model.Id" />
-                <input type="hidden" name="quantidade" value="1" />
-                <button type="submit" class="btn btn-outline-secondary px-4 py-2">
-                    ADICIONAR AO CARRINHO
-                </button>
-            </form>
-
-
+<div class="pd-wrap">
+    <!-- Imagem -->
+    <div class="pd-left">
+        <div class="pd-photo">
+            <img src="@Url.Content("~/img/" + Model.Imagens?.FirstOrDefault()?.Url)"
+                 alt="@Model.Nome" />
         </div>
     </div>
+
+    <!-- Texto e ações -->
+    <div class="pd-right">
+        <div class="pd-card">
+            <h2 class="pd-title">@Model.Nome</h2>
+            <p class="pd-desc">
+                @Model.Descricao
+            </p>
+        </div>
+
+        <div class="pd-price">R$ @Model.Preco.ToString("N2")</div>
+
+        <form asp-controller="Carrinho"
+              asp-action="Adicionar"
+              method="post"
+              asp-route-next="index"
+              class="pd-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="produtoId" value="@Model.Id" />
+            <input type="hidden" name="quantidade" value="1" />
+            <button type="submit" class="btn-cart">ADICIONAR AO CARRINHO</button>
+        </form>
+    </div>
 </div>
+
+@section Styles{
+<style>
+/* Paleta e fonte do mock */
+:root{
+  --bg:#efe8d9;
+  --card:#f3eadb;
+  --ink:#2a241d;
+  --btn:#8b6248;
+  --btn-dark:#6f4f3b;
+  --shadow:0 10px 22px rgba(0,0,0,.12);
+  --radius:16px;
+  --radius-sm:12px;
+}
+body{ background:#f4efe3; }
+
+/* Grid principal */
+.pd-wrap{
+  max-width:980px; margin:28px auto; padding:0 8px;
+  display:grid; grid-template-columns: 44% 56%; gap:26px; align-items:flex-start;
+}
+
+/* Foto */
+.pd-photo{
+  background:#fff; border-radius:12px; box-shadow:var(--shadow);
+  border:1px solid rgba(0,0,0,.06); padding:18px;
+}
+.pd-photo img{
+  width:100%; height:420px; object-fit:contain; display:block;
+  border-radius:10px;
+}
+
+/* Card de texto */
+.pd-card{
+  background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+  border:1px solid rgba(0,0,0,.08); padding:18px 20px;
+}
+.pd-title{
+  margin:6px 0 10px; text-align:center;
+  font-family:"Cinzel","Cormorant Garamond",serif;
+  font-size:1.15rem; letter-spacing:.06rem; text-transform:uppercase;
+}
+.pd-desc{
+  margin:0; font-size:.85rem; color:#645a50; text-align:justify;
+  line-height:1.5; text-transform:uppercase; letter-spacing:.02rem;
+}
+
+/* Preço e botão */
+.pd-price{
+  margin:16px 0 10px;
+  font-size:1.55rem; font-weight:800; color:var(--ink); 
+}
+.btn-cart{
+  display:inline-block; border:none; cursor:pointer;
+  background:var(--btn); color:#fff; padding:12px 22px;
+  border-radius:20px; box-shadow:0 6px 14px rgba(0,0,0,.12);
+  letter-spacing:.04rem; font-weight:600;
+  transition:.15s ease; text-transform:uppercase;
+}
+.btn-cart:hover{ background:var(--btn-dark); transform:translateY(-1px); }
+
+.pd-form{ margin-top:8px; }
+
+/* Responsivo */
+media (max-width: 900px){
+  .pd-wrap{ grid-template-columns:1fr; }
+  .pd-photo img{ height:360px; }
+}
+</style>
+}

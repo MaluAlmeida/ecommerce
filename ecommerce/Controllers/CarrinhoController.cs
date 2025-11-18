@@ -11,26 +11,30 @@ namespace ecommerce.Controllers
         private readonly IPedidoRepository _pedidoRepository;
         private readonly CarrinhoRepository _carrinhoRepository;
 
-        public CarrinhoController(IProdutoRepository produtoRepository,
-            CarrinhoRepository carrinhoRepository, IPedidoRepository pedidoRepository)
+        public CarrinhoController(
+            IProdutoRepository produtoRepository,
+            CarrinhoRepository carrinhoRepository,
+            IPedidoRepository pedidoRepository)
         {
             _produtoRepository = produtoRepository;
             _carrinhoRepository = carrinhoRepository;
             _pedidoRepository = pedidoRepository;
-
         }
 
         // Página do carrinho
         public async Task<IActionResult> Index()
         {
-            // Obter itens do carrinho
-            var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
-                                ?? new List<ItemPedido>();
+            var itensCarrinho = await AuxiliarCarrinho
+                .ObterItensCarrinho(Request, Response, _produtoRepository)
+                ?? new List<ItemPedido>();
+
+            // reforço: garante imagem mesmo que o helper não tenha setado
+            foreach (var it in itensCarrinho)
+                it.Imagem ??= it.Produto?.Imagens?.FirstOrDefault();
 
             decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
-            decimal taxaEntrega = 10m; // valor fixo, pode ajustar se necessário
+            decimal taxaEntrega = 10m;
 
-            // Montar o model Carrinho
             var carrinho = new Carrinho
             {
                 Itens = itensCarrinho,
@@ -41,36 +45,34 @@ namespace ecommerce.Controllers
             return View(carrinho);
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Infos()
         {
-            // Verificar se usuário está logado
+            // Verificar login
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
             if (string.IsNullOrEmpty(usuarioIdStr))
-            {
                 return RedirectToAction("Login", "Usuario");
-            }
             int usuarioId = Convert.ToInt32(usuarioIdStr);
 
-            // Obter itens do carrinho (ItemPedido)
-            var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
-                                ?? new List<ItemPedido>();
+            // Itens
+            var itensCarrinho = await AuxiliarCarrinho
+                .ObterItensCarrinho(Request, Response, _produtoRepository)
+                ?? new List<ItemPedido>();
+
+            // reforço: garante imagem
+            foreach (var it in itensCarrinho)
+                it.Imagem ??= it.Produto?.Imagens?.FirstOrDefault();
 
             decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
-            decimal taxaEntrega = 10m; // Valor fixo
+            decimal taxaEntrega = 10m;
 
-            // Obter endereços do usuário
+            // Endereços e cartões do usuário
             var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId) ?? new List<Endereco>();
-
-            // Obter cartões do usuário
             var cartoes = _carrinhoRepository.ObterCartoesPorUsuario(usuarioId)?.ToList() ?? new List<Cartao>();
 
-
-            // Montar o model Carrinho
             var carrinho = new Carrinho
             {
-                Itens = itensCarrinho,   // <== agora é List<ItemPedido>
+                Itens = itensCarrinho,
                 Enderecos = enderecos,
                 Cartoes = cartoes,
                 Subtotal = subtotal,
@@ -86,7 +88,6 @@ namespace ecommerce.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Adicionar(int produtoId, int quantidade = 1, string? next = "index")
         {
-            // valida produto
             var produto = await _produtoRepository.ProdutosPorId(produtoId);
             if (produto == null)
             {
@@ -94,8 +95,9 @@ namespace ecommerce.Controllers
                 return RedirectToAction("Index", "Loja");
             }
 
-            var itens = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
-                        ?? new List<ItemPedido>();
+            var itens = await AuxiliarCarrinho
+                .ObterItensCarrinho(Request, Response, _produtoRepository)
+                ?? new List<ItemPedido>();
 
             var mapa = itens
                 .GroupBy(i => i.Produto.Id)
@@ -113,60 +115,23 @@ namespace ecommerce.Controllers
             };
         }
 
-
-
         [HttpPost]
         public async Task<IActionResult> SalvarEndereco(Endereco endereco)
         {
-            // Verifica se o usuário está logado
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
             if (string.IsNullOrEmpty(usuarioIdStr))
                 return RedirectToAction("Login", "Usuario");
-
             int usuarioId = Convert.ToInt32(usuarioIdStr);
             endereco.UsuarioId = usuarioId;
 
-            // Se o model estiver inválido
             if (!ModelState.IsValid)
             {
-                // Recarrega o carrinho
                 var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
                                     ?? new List<ItemPedido>();
+                foreach (var it in itensCarrinho) it.Imagem ??= it.Produto?.Imagens?.FirstOrDefault();
+
                 decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
                 decimal taxaEntrega = 10m;
-
-                var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId)?.ToList() ?? new List<Endereco>();
-                var cartoes = _carrinhoRepository.ObterCartoesPorUsuario(usuarioId)?.ToList() ?? new List<Cartao>();
-
-                var carrinho = new Carrinho
-                {
-                    Itens = itensCarrinho,
-                    Enderecos = enderecos,
-                    Cartoes = cartoes,
-                    Subtotal = subtotal,
-                    TaxaEntrega = taxaEntrega,
-                    NovoEndereco = endereco,   // mantém os dados preenchidos
-                    NovoCartao = new Cartao()
-                };
-
-                return View("Infos", carrinho);
-            }
-
-            try
-            {
-                _carrinhoRepository.AdicionarEndereco(endereco);
-                return RedirectToAction("Infos");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Erro ao salvar o endereço: " + ex.Message);
-
-                // Recarrega o carrinho em caso de erro
-                var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
-                                    ?? new List<ItemPedido>();
-                decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
-                decimal taxaEntrega = 10m;
-
                 var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId)?.ToList() ?? new List<Endereco>();
                 var cartoes = _carrinhoRepository.ObterCartoesPorUsuario(usuarioId)?.ToList() ?? new List<Cartao>();
 
@@ -180,39 +145,24 @@ namespace ecommerce.Controllers
                     NovoEndereco = endereco,
                     NovoCartao = new Cartao()
                 };
-
                 return View("Infos", carrinho);
             }
-        }
 
-
-        [HttpPost]
-        public async Task<IActionResult> SalvarCartao(Cartao cartao)
-        {
-            // Garante que o model foi recebido
-            if (cartao == null)
+            try
             {
-                ModelState.AddModelError("", "Não foi possível processar o cartão.");
+                _carrinhoRepository.AdicionarEndereco(endereco);
                 return RedirectToAction("Infos");
             }
-
-            // Verifica se o usuário está logado
-            var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
-            if (string.IsNullOrEmpty(usuarioIdStr))
-                return RedirectToAction("Login", "Usuario");
-
-            int usuarioId = Convert.ToInt32(usuarioIdStr);
-            cartao.UsuarioId = usuarioId;
-
-            // Se o ModelState for inválido
-            if (!ModelState.IsValid)
+            catch (Exception ex)
             {
-                // Recarrega o carrinho completo
+                ModelState.AddModelError("", "Erro ao salvar o endereço: " + ex.Message);
+
                 var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
                                     ?? new List<ItemPedido>();
+                foreach (var it in itensCarrinho) it.Imagem ??= it.Produto?.Imagens?.FirstOrDefault();
+
                 decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
                 decimal taxaEntrega = 10m;
-
                 var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId)?.ToList() ?? new List<Endereco>();
                 var cartoes = _carrinhoRepository.ObterCartoesPorUsuario(usuarioId)?.ToList() ?? new List<Cartao>();
 
@@ -223,30 +173,37 @@ namespace ecommerce.Controllers
                     Cartoes = cartoes,
                     Subtotal = subtotal,
                     TaxaEntrega = taxaEntrega,
-                    NovoEndereco = new Endereco(),
-                    NovoCartao = cartao // mantém os dados preenchidos do cartão
+                    NovoEndereco = endereco,
+                    NovoCartao = new Cartao()
                 };
-
                 return View("Infos", carrinho);
             }
+        }
 
-            try
+        [HttpPost]
+        public async Task<IActionResult> SalvarCartao(Cartao cartao)
+        {
+            if (cartao == null)
             {
-                // Salvar cartão no banco
-                _carrinhoRepository.AdicionarCartao(cartao);
-
+                ModelState.AddModelError("", "Não foi possível processar o cartão.");
                 return RedirectToAction("Infos");
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Erro ao salvar o cartão: " + ex.Message);
 
-                // Recarrega o carrinho completo em caso de erro
+            var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
+            if (string.IsNullOrEmpty(usuarioIdStr))
+                return RedirectToAction("Login", "Usuario");
+
+            int usuarioId = Convert.ToInt32(usuarioIdStr);
+            cartao.UsuarioId = usuarioId;
+
+            if (!ModelState.IsValid)
+            {
                 var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
                                     ?? new List<ItemPedido>();
+                foreach (var it in itensCarrinho) it.Imagem ??= it.Produto?.Imagens?.FirstOrDefault();
+
                 decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
                 decimal taxaEntrega = 10m;
-
                 var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId)?.ToList() ?? new List<Endereco>();
                 var cartoes = _carrinhoRepository.ObterCartoesPorUsuario(usuarioId)?.ToList() ?? new List<Cartao>();
 
@@ -260,35 +217,60 @@ namespace ecommerce.Controllers
                     NovoEndereco = new Endereco(),
                     NovoCartao = cartao
                 };
-
                 return View("Infos", carrinho);
             }
 
+            try
+            {
+                _carrinhoRepository.AdicionarCartao(cartao);
+                return RedirectToAction("Infos");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Erro ao salvar o cartão: " + ex.Message);
 
+                var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
+                                    ?? new List<ItemPedido>();
+                foreach (var it in itensCarrinho) it.Imagem ??= it.Produto?.Imagens?.FirstOrDefault();
+
+                decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
+                decimal taxaEntrega = 10m;
+                var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId)?.ToList() ?? new List<Endereco>();
+                var cartoes = _carrinhoRepository.ObterCartoesPorUsuario(usuarioId)?.ToList() ?? new List<Cartao>();
+
+                var carrinho = new Carrinho
+                {
+                    Itens = itensCarrinho,
+                    Enderecos = enderecos,
+                    Cartoes = cartoes,
+                    Subtotal = subtotal,
+                    TaxaEntrega = taxaEntrega,
+                    NovoEndereco = new Endereco(),
+                    NovoCartao = cartao
+                };
+                return View("Infos", carrinho);
+            }
         }
+
         [HttpPost]
         public async Task<IActionResult> FinalizarPedido(
-    int EnderecoSelecionadoId,
-    string MetodoPagamento,
-    int? CartaoId,
-
-    // campos do endereço digitado na própria tela
-    string? Logradouro, string? Numero, string? CEP,
-    string? Cidade, string? Estado, string? Complemento)
+            int EnderecoSelecionadoId,
+            string MetodoPagamento,
+            int? CartaoId,
+            string? Logradouro, string? Numero, string? CEP,
+            string? Cidade, string? Estado, string? Complemento)
         {
-            // valida método
             if (string.IsNullOrWhiteSpace(MetodoPagamento))
             {
                 TempData["Erro"] = "Por favor, selecione um método de pagamento antes de continuar.";
                 return RedirectToAction("Infos");
             }
 
-            // usuário
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
-            if (string.IsNullOrEmpty(usuarioIdStr)) return RedirectToAction("Login", "Usuario");
+            if (string.IsNullOrEmpty(usuarioIdStr))
+                return RedirectToAction("Login", "Usuario");
             int usuarioId = Convert.ToInt32(usuarioIdStr);
 
-            // itens do carrinho
             var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository);
             if (itensCarrinho == null || !itensCarrinho.Any())
             {
@@ -296,7 +278,7 @@ namespace ecommerce.Controllers
                 return RedirectToAction("Index");
             }
 
-            // **NOVA LÓGICA**: se não veio endereço selecionado, tenta criar a partir dos campos da tela
+            // Garante endereço (mesma lógica que você já tinha)
             if (EnderecoSelecionadoId <= 0)
             {
                 bool temAlgumCampo =
@@ -320,24 +302,17 @@ namespace ecommerce.Controllers
                         Estado = Estado ?? "",
                         Complemento = Complemento ?? ""
                     };
-
-                    // salva e recupera o Id
                     _carrinhoRepository.AdicionarEndereco(novo);
 
-                    // se o repositório não popula o Id, pegue o último do usuário:
                     if (novo.Id <= 0)
                     {
                         var todos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId) ?? new List<Endereco>();
                         EnderecoSelecionadoId = todos.OrderByDescending(e => e.Id).Select(e => e.Id).FirstOrDefault();
                     }
-                    else
-                    {
-                        EnderecoSelecionadoId = novo.Id;
-                    }
+                    else EnderecoSelecionadoId = novo.Id;
                 }
                 else
                 {
-                    // ainda sem endereço => cria um mínimo “rápido”
                     var novo = new Endereco
                     {
                         UsuarioId = usuarioId,
@@ -355,19 +330,18 @@ namespace ecommerce.Controllers
                 }
             }
 
-            // cálculo
             decimal subtotal = itensCarrinho.Sum(i => i.PrecoUnitario * i.Quantidade);
             decimal taxaEntrega = 10m;
-            decimal valorTotal = MetodoPagamento == "Pix"
+            decimal valorTotal = (MetodoPagamento == "Pix")
                 ? (subtotal + taxaEntrega) * 0.95m
                 : subtotal + taxaEntrega;
 
-            int? cartaoIdFinal = MetodoPagamento == "Pix" ? null : CartaoId;
+            int? cartaoIdFinal = (MetodoPagamento == "Pix") ? null : CartaoId;
 
             var pedido = new Pedido
             {
                 UsuarioId = usuarioId,
-                EnderecoId = EnderecoSelecionadoId,     // agora SEM BLOQUEIO
+                EnderecoId = EnderecoSelecionadoId,
                 MetodoPagamentoId = (MetodoPagamento == "Pix") ? 2 : 1,
                 CartaoId = cartaoIdFinal,
                 TaxaEntrega = taxaEntrega,
@@ -393,17 +367,12 @@ namespace ecommerce.Controllers
             }
         }
 
-
-
-
         [HttpGet]
         public async Task<IActionResult> Pix(int pedidoId)
         {
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
             if (string.IsNullOrEmpty(usuarioIdStr))
-            {
                 return RedirectToAction("Login", "Usuario");
-            }
             int usuarioId = Convert.ToInt32(usuarioIdStr);
 
             var pedido = await _pedidoRepository.ObterPedidoPorId(pedidoId);
@@ -414,14 +383,14 @@ namespace ecommerce.Controllers
             }
 
             var itensCarrinho = pedido.Itens?.ToList() ?? new List<ItemPedido>();
+            foreach (var it in itensCarrinho) it.Imagem ??= it.Produto?.Imagens?.FirstOrDefault();
+
             decimal subtotal = itensCarrinho.Sum(i => i.PrecoUnitario * i.Quantidade);
             decimal taxaEntrega = pedido.TaxaEntrega;
 
-            // Buscar endereços e cartões do usuário
             var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId) ?? new List<Endereco>();
             var cartoes = _carrinhoRepository.ObterCartoesPorUsuario(usuarioId)?.ToList() ?? new List<Cartao>();
 
-            // Montar o carrinho completo
             var carrinho = new Carrinho
             {
                 Itens = itensCarrinho,
@@ -436,10 +405,8 @@ namespace ecommerce.Controllers
                 Expiracao = pedido.DataPedido.AddMinutes(30)
             };
 
-            // Gerar código Pix fictício
             ViewBag.CodigoPix = $"PIX-{pedido.Id}-{Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()}";
             ViewBag.PedidoId = pedido.Id;
-
 
             return View(carrinho);
         }
@@ -447,14 +414,9 @@ namespace ecommerce.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmarPagamento(int pedidoId)
         {
-
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
             if (string.IsNullOrEmpty(usuarioIdStr))
-            {
                 return RedirectToAction("Login", "Usuario");
-            }
-
-            int usuarioId = Convert.ToInt32(usuarioIdStr);
 
             try
             {
@@ -465,7 +427,6 @@ namespace ecommerce.Controllers
                     return RedirectToAction("Index");
                 }
 
-                // Atualizar status e data do pagamento
                 pedido.StatusPagamento = "Pago";
                 pedido.DataPagamento = DateTime.Now;
 
@@ -495,7 +456,6 @@ namespace ecommerce.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Obter pedido do banco
             var pedido = await _pedidoRepository.ObterPedidoPorId(pedidoId);
             if (pedido == null)
             {
@@ -503,20 +463,18 @@ namespace ecommerce.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Converter Pedido em Carrinho
             var carrinho = new Carrinho
             {
                 Itens = pedido.Itens,
                 Subtotal = pedido.Itens.Sum(i => i.PrecoUnitario * i.Quantidade),
                 TaxaEntrega = pedido.TaxaEntrega,
                 CartaoSelecionadoId = pedido.CartaoId,
-                Enderecos = new List<Endereco>(), // opcional, se quiser exibir endereços
-                Cartoes = new List<Cartao>() // opcional, se quiser exibir cartões
+                Enderecos = new List<Endereco>(),
+                Cartoes = new List<Cartao>()
             };
 
-            ViewBag.PedidoId = pedido.Id; // necessário para o POST
-
-            return View(carrinho); // continua usando @model Carrinho
+            ViewBag.PedidoId = pedido.Id;
+            return View(carrinho);
         }
 
         [HttpPost]
@@ -525,8 +483,6 @@ namespace ecommerce.Controllers
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
             if (string.IsNullOrEmpty(usuarioIdStr))
                 return RedirectToAction("Login", "Usuario");
-
-            int usuarioId = Convert.ToInt32(usuarioIdStr);
 
             var pedido = await _pedidoRepository.ObterPedidoPorId(pedidoId);
             if (pedido == null)
@@ -553,11 +509,7 @@ namespace ecommerce.Controllers
         public IActionResult ConfirmPag(int pedidoId)
         {
             ViewBag.PedidoId = pedidoId;
-            // monte o model que a view precisa, se houver
             return View("ConfirmPag");
         }
-
-
     }
-
 }
