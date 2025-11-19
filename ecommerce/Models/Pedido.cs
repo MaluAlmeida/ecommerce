@@ -15,7 +15,7 @@
         public DateTime DataPagamento { get; set; } 
         public DateTime Expiracao { get; set; }
 
-        // Navegação
+
         public Usuario? Usuario { get; set; }
         public Endereco? Endereco { get; set; }
         public MetodoPagamento? MetodoPagamento { get; set; }

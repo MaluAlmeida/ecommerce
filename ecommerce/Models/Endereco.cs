@@ -13,7 +13,6 @@
         public string CEP { get; set; } = string.Empty;
         public string? Complemento { get; set; }
 
-        // Navegação
         public Usuario? Usuario { get; set; }
     }
 }

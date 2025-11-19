@@ -1,7 +1,6 @@
 ﻿@model ecommerce.Models.Pedido
 
 @{
-    // Badge cores
     string paymentBadgeColor = "bg-danger";
     if (Model.StatusPagamento == "Pendente") paymentBadgeColor = "bg-warning text-dark";
     else if (Model.StatusPagamento == "Pago") paymentBadgeColor = "bg-success";

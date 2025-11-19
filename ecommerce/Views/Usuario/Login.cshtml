@@ -7,7 +7,6 @@
 <section class="login-wrap">
     <div class="login-card">
 
-        @* Aviso de erro (mantido) *@
         @if (ViewBag.ErrorMessage != null)
         {
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -39,8 +38,7 @@
                 <a asp-controller="Usuario" asp-action="Registrar">CADASTRE-SE</a>
             </div>
 
-            @* Se quiser manter “Esqueceu a senha?”, deixe abaixo *@
-            @* <div class="restore"><a asp-controller="Usuario" asp-action="EsqueceuSenha">Esqueceu sua senha?</a></div> *@
+         
         </form>
     </div>
 </section>
@@ -48,16 +46,16 @@
 @section Styles {
     <style>
         :root {
-            --bg-parchment: #F3EDE1; /* fundo bege da página */
-            --card: #F7F1E6; /* bege mais claro do card */
+            --bg-parchment: #F3EDE1; 
+            --card: #F7F1E6; 
             --ink: #1b1b1b;
-            --accent: #8a5f43; /* marrom do botão */
+            --accent: #8a5f43; 
             --shadow: 0 8px 18px rgba(0,0,0,.15);
             --radius: 14px;
         }
 
         .login-wrap {
-            min-height: calc(100vh - 220px); /* ajuste conforme altura do seu header/footer */
+            min-height: calc(100vh - 220px); 
             background: var(--bg-parchment);
             display: flex;
             align-items: center;
@@ -90,7 +88,7 @@
             height: 42px;
             border: none;
             border-radius: 999px;
-            background: #eae9e6; /* cinza claro do print */
+            background: #eae9e6;
             padding: 0 16px;
             outline: none;
             font-size: .98rem;
@@ -146,7 +144,6 @@
                 transform: translateY(-1px);
             }
 
-        /* Opcional: esconder o título antigo se ainda estiver no layout */
         h2.text-center, hr {
             display: none;
         }

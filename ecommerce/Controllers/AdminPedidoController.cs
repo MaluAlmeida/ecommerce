@@ -64,7 +64,7 @@ namespace ecommerce.Controllers
             return View(pedido);
         }
 
-        // POST para salvar as alterações
+        // salvar as alterações
         [HttpPost]
         public async Task<IActionResult> Editar(int id, string? status_Pedido)
         {

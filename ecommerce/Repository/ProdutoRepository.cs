@@ -41,7 +41,6 @@ ORDER BY p.Id, pi.OrdemImagem;
                         produtoDict.Add(p.Id, produtoEntry);
                     }
 
-                    // Note: ProdutoImagem.ImagemId mapped from pi.Id AS ImagemId
                     if (img != null && img.ImagemId != 0)
                         produtoEntry.Imagens.Add(img);
 
@@ -50,7 +49,6 @@ ORDER BY p.Id, pi.OrdemImagem;
                 splitOn: "ImagemId"
             );
 
-            // já tem debug console — bom para confirmar
             foreach (var p in produtoDict.Values)
             {
                 Console.WriteLine($"Produto {p.Nome} tem {p.Imagens.Count} imagens");
@@ -90,7 +88,6 @@ ORDER BY p.Id DESC, pi.OrdemImagem;
                         produtoDict.Add(p.Id, produtoEntry);
                     }
 
-                    // Note: ProdutoImagem.ImagemId mapped from pi.Id AS ImagemId
                     if (img != null && img.ImagemId != 0)
                         produtoEntry.Imagens.Add(img);
 
@@ -99,7 +96,7 @@ ORDER BY p.Id DESC, pi.OrdemImagem;
                 splitOn: "ImagemId"
             );
 
-            // já tem debug console — bom para confirmar
+
             foreach (var p in produtoDict.Values)
             {
                 Console.WriteLine($"Produto {p.Nome} tem {p.Imagens.Count} imagens");
@@ -121,7 +118,7 @@ ORDER BY p.Id DESC, pi.OrdemImagem;
 
             try
             {
-                // Inserir produto (sem ImageUrl)
+                // Inserir produto 
                 var sqlProduto = @"
             INSERT INTO Produtos (Nome, Categoria, Descricao, Preco, EstadoConservacao, DataCriada)
             VALUES (@Nome, @Categoria, @Descricao, @Preco, @EstadoConservacao, @DataCriada);
@@ -129,7 +126,7 @@ ORDER BY p.Id DESC, pi.OrdemImagem;
 
                 produto.Id = await conn.ExecuteScalarAsync<int>(sqlProduto, produto, transaction);
 
-                // Inserir imagens (se existirem)
+                // Inserir imagens 
                 if (produto.Imagens != null && produto.Imagens.Count > 0)
                 {
                     var sqlImagem = @"
@@ -138,8 +135,7 @@ ORDER BY p.Id DESC, pi.OrdemImagem;
 
                     foreach (var img in produto.Imagens)
                     {
-                        img.ProdutoId = produto.Id; // garante FK correta
-                                                    // Se OrdemImagem não estiver setada, coloca 1 como default
+                        img.ProdutoId = produto.Id; 
                         if (img.OrdemImagem == 0) img.OrdemImagem = 1;
 
                         await conn.ExecuteAsync(sqlImagem, new
@@ -218,7 +214,6 @@ ORDER BY p.Id DESC, pi.OrdemImagem;
             {
                 foreach (var img in produto.Imagens)
                 {
-                    // Se a imagem já existe no banco (tem Id), podemos atualizar a URL ou ordem
                     if (img.ImagemId > 0)
                     {
                         var sqlImgUpdate = @"
@@ -258,10 +253,8 @@ ORDER BY p.Id DESC, pi.OrdemImagem;
             ";
 
             await using var connection = new MySqlConnection(_connectionString);
-            // QueryAsync sem tipagem -> retorna IEnumerable<dynamic>
             var rows = await connection.QueryAsync(sql);
 
-            // Transformar explicitamente em strings e agrupar
             var mapped = rows
                 .Select(r => new
                 {

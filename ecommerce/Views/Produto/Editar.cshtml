@@ -101,7 +101,6 @@
         document.addEventListener("DOMContentLoaded", function () {
             const precoInput = document.getElementById("Preco");
 
-            // Valor inicial formatado
             if (!precoInput.value) {
                 precoInput.value = "0,00";
             }
@@ -126,7 +125,6 @@
                 e.target.value = value;
             });
 
-            // Garante o formato correto ao perder o foco
             precoInput.addEventListener("blur", function (e) {
                 if (e.target.value === "" || e.target.value === "0") {
                     e.target.value = "0,00";
@@ -138,7 +136,7 @@
             if (!confirm("Deseja realmente remover esta imagem?")) return;
 
             const formData = new FormData();
-            formData.append("id", imagemId); // parâmetro enviado ao controller
+            formData.append("id", imagemId); 
 
             fetch('@Url.Action("RemoverImagem", "Produto")', {
                 method: 'POST',

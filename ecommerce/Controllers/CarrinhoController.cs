@@ -28,7 +28,6 @@ namespace ecommerce.Controllers
                 .ObterItensCarrinho(Request, Response, _produtoRepository)
                 ?? new List<ItemPedido>();
 
-            // reforço: garante imagem mesmo que o helper não tenha setado
             foreach (var it in itensCarrinho)
                 it.Imagem ??= it.Produto?.Imagens?.FirstOrDefault();
 
@@ -59,7 +58,7 @@ namespace ecommerce.Controllers
                 .ObterItensCarrinho(Request, Response, _produtoRepository)
                 ?? new List<ItemPedido>();
 
-            // reforço: garante imagem
+        
             foreach (var it in itensCarrinho)
                 it.Imagem ??= it.Produto?.Imagens?.FirstOrDefault();
 
@@ -278,7 +277,6 @@ namespace ecommerce.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Garante endereço (mesma lógica que você já tinha)
             if (EnderecoSelecionadoId <= 0)
             {
                 bool temAlgumCampo =

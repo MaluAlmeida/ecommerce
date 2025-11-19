@@ -1,4 +1,4 @@
-﻿<!-- Modal de sucesso (autoabre) -->
+﻿
 <div class="s-backdrop" id="sBackdrop"></div>
 
 <div class="s-modal" id="sModal" role="dialog" aria-modal="true">
@@ -47,7 +47,7 @@
       const back  = document.getElementById('sBackdrop');
       const close = document.getElementById('sClose');
 
-      // abre automaticamente
+
       requestAnimationFrame(() => { modal.classList.add('show'); back.classList.add('show'); });
 
       const fechar = () => { modal.classList.remove('show'); back.classList.remove('show'); };

@@ -22,7 +22,7 @@ namespace ecommerce.Controllers
         {
             var produtos = await _produtoRepository.ProdutosOrdenados();
 
-            // Busca
+           
             if (!string.IsNullOrEmpty(buscar))
             {
                 produtos = produtos
@@ -30,14 +30,12 @@ namespace ecommerce.Controllers
                              || p.Categoria.Contains(buscar, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 
-                pagIndex = 1; // reset para página 1
+                pagIndex = 1; 
             }
 
-            // Normaliza coluna
             coluna ??= "Id";
             ordPor ??= "desc";
 
-            // Ordenação
             produtos = coluna switch
             {
                 "Nome" => ordPor == "asc" ? produtos.OrderBy(p => p.Nome).ToList() : produtos.OrderByDescending(p => p.Nome).ToList(),
@@ -55,7 +53,6 @@ namespace ecommerce.Controllers
             int count = produtos.Count();
             int totalPag = (int)Math.Ceiling((decimal)count / pagTam);
 
-            // Garantir que a página atual não ultrapasse o total de páginas (ou seja 1 se não houver registros)
             if (totalPag == 0) totalPag = 1;
             if (pagIndex > totalPag) pagIndex = totalPag;
 
@@ -105,11 +102,9 @@ namespace ecommerce.Controllers
                     // Define o caminho para salvar
                     var caminhoPasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img");
 
-                    // Garante que a pasta exista
                     if (!Directory.Exists(caminhoPasta))
                         Directory.CreateDirectory(caminhoPasta);
 
-                    // Gera um nome único para o arquivo
                     var nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(imagemArquivo.FileName);
                     var caminhoCompleto = Path.Combine(caminhoPasta, nomeArquivo);
 
@@ -130,7 +125,6 @@ namespace ecommerce.Controllers
                 }
             }
 
-            // Chama o repositório para salvar o produto e suas imagens
             await _produtoRepository.AdicionarProduto(produto);
 
             return RedirectToAction("Index");
@@ -157,7 +151,6 @@ namespace ecommerce.Controllers
 
             var caminhoPasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img");
 
-            // Criar pasta se necessário
             if (!Directory.Exists(caminhoPasta))
                 Directory.CreateDirectory(caminhoPasta);
 
@@ -192,7 +185,6 @@ namespace ecommerce.Controllers
                 }
             }
 
-            // Atualiza os dados do produto (nome, preço, etc.) e mantém a lista de imagens
             await _produtoRepository.AtualizarProduto(produto);
 
             return RedirectToAction("Index");
@@ -215,7 +207,7 @@ namespace ecommerce.Controllers
                 {
                     if (!string.IsNullOrWhiteSpace(imagem.Url))
                     {
-                        // Garante que o caminho esteja correto (sem barras duplicadas)
+                        // Garante que o caminho esteja correto 
                         var caminhoImagem = Path.Combine(
                             Directory.GetCurrentDirectory(),
                             "wwwroot",

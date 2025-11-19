@@ -25,11 +25,10 @@ namespace ecommerce.Controllers
             int count = produtos.Count();
             int totalPag = (int)Math.Ceiling((decimal)count / pagTam);
 
-            // Garantir que a página atual não ultrapasse o total de páginas (ou seja 1 se não houver registros)
             if (totalPag == 0) totalPag = 1;
             if (pagIndex > totalPag) pagIndex = totalPag;
 
-            // Pegar produtos da página atual
+            // Pegar produtos da página 
             var produtosPaginados = produtos
                 .Skip((pagIndex - 1) * pagTam)
                 .Take(pagTam)
@@ -50,7 +49,7 @@ namespace ecommerce.Controllers
         {
             var produto = await _produtoRepository.ProdutosPorId(id);
             if (produto == null)
-                return RedirectToAction("Index"); // da própria Loja
+                return RedirectToAction("Index"); 
 
             return View(produto);
         }

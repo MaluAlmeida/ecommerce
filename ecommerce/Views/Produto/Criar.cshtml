@@ -6,7 +6,6 @@
 
     <form asp-action="Criar" asp-controller="Produto" method="post" enctype="multipart/form-data" id="formProduto">
       <div class="pf-grid">
-        <!-- Coluna esquerda -->
         <div class="pf-col">
           <div class="pf-group">
             <label class="pf-label" for="Nome">Nome</label>
@@ -23,7 +22,6 @@
           </div>
         </div>
 
-        <!-- Coluna direita -->
         <div class="pf-col">
           <div class="pf-group">
             <label class="pf-label" for="Categoria">Categoria</label>
@@ -71,11 +69,11 @@
 @section Styles{
 <style>
   :root{
-    --bg-parchment:#F3EDE1;   /* fundo da página */
-    --card:#F1E8D7;           /* cartão do formulário */
+    --bg-parchment:#F3EDE1; 
+    --card:#F1E8D7;          
     --ink:#1b1b1b;
-    --accent:#8a5f43;         /* marrom do botão */
-    --muted: white; /* cinza dos inputs */
+    --accent:#8a5f43;       
+    --muted: white; 
     --radius:18px;
     --shadow:0 8px 18px rgba(0,0,0,.12);
   }
@@ -104,12 +102,11 @@
 
   .pf-input{
     width:100%; height:42px; border:none; outline:none; border-radius:12px;
-            background: white; /* cinza claro */
+            background: white; 
     padding:0 14px; color:var(--ink); font-size:.98rem;
   }
   .pf-textarea{ height:auto; min-height:70px; padding:10px 14px; resize:vertical; }
 
-  /* Upload box visual (área cinza como no mock) */
   .pf-upload{
     background:#e0ddd8; border-radius:12px; border:1px dashed rgba(0,0,0,.2);
     height:80px; display:flex; align-items:center; justify-content:center;
@@ -141,7 +138,6 @@
 
 @section Scripts{
   <script>
-    // sua máscara de preço original (ajustada para esta view)
     document.addEventListener("DOMContentLoaded", function () {
       const precoInput = document.getElementById("Preco");
       if (precoInput && !precoInput.value) precoInput.value = "0,00";

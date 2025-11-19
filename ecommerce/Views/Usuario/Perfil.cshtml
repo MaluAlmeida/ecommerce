@@ -31,7 +31,6 @@
   </div>
 </section>
 
-@* --- Modal de Edição (mantido) --- *@
 <div class="modal fade" id="EditarPerfil" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -86,10 +85,10 @@
 @section Styles{
 <style>
   :root{
-    --bg-parchment:#F3EDE1;   /* fundo da página */
-    --card:#F1E8D7;           /* cartão */
+    --bg-parchment:#F3EDE1;  
+    --card:#F1E8D7;          
     --ink:#1b1b1b;
-    --accent:#8a5f43;         /* marrom */
+    --accent:#8a5f43;        
     --radius:14px;
     --shadow:0 8px 18px rgba(0,0,0,.12);
   }
@@ -107,28 +106,27 @@
   media (max-width: 900px){ .pfp-grid{ grid-template-columns: 1fr; } }
 
         .pfp-col {
-            /* antes: display:flex; flex-direction:column; ... */
+            
             display: block;
         }
 
         .pfp-row {
-            /* mantém cada par “título : valor” grudadinho */
             display: grid;
-            grid-template-columns: auto 1fr; /* título + valor */
-            column-gap: 10px; /* espaço só entre os dois */
+            grid-template-columns: auto 1fr; 
+            column-gap: 10px;
             align-items: baseline;
             margin-bottom: 6px;
         }
 
         .pfp-key {
-            /* antes tinha min-width: 180px; */
+            
             min-width: unset;
             margin-right: 0;
-            white-space: nowrap; /* não quebra “DATA NASCIMENTO :” */
+            white-space: nowrap; 
         }
 
         .pfp-val {
-            white-space: nowrap; /* evita quebrar o valor */
+            white-space: nowrap; 
         }
 
   .pfp-actions{

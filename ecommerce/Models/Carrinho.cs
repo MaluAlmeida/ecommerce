@@ -10,18 +10,18 @@
         public Cartao NovoCartao { get; set; } = new Cartao();
         public List<ProdutoImagem> Imagens { get; set; } = new List<ProdutoImagem>();
 
-        // Id selecionados no form
-        public int EnderecoSelecionadoId { get; set; }       // obrigatório
-        public int? CartaoSelecionadoId { get; set; }       // opcional, se for Pix
+
+        public int EnderecoSelecionadoId { get; set; }      
+        public int? CartaoSelecionadoId { get; set; }       
         public string MetodoPagamento { get; set; } = string.Empty;
 
         public DateTime CriadoEm { get; set; }
         public DateTime Expiracao { get; set; }
 
-        // Propriedades calculadas
-        public int EnderecoId => EnderecoSelecionadoId;     // mapeia automaticamente
+
+        public int EnderecoId => EnderecoSelecionadoId;    
         public int? CartaoId => MetodoPagamento == "Cartão" ? CartaoSelecionadoId : null;
-        public int MetodoPagamentoId => MetodoPagamento == "Pix" ? 2 : 1; // 1=Cartão, 2=Pix
+        public int MetodoPagamentoId => MetodoPagamento == "Pix" ? 2 : 1; 
         public decimal ValorTotal   { get; set; }
 
         public decimal Subtotal { get; set; }

@@ -114,8 +114,6 @@ namespace ecommerce.Controllers
             return View(perfil);
         }
 
-
-        // POST: Perfil
         [HttpPost]
         public async Task<IActionResult> Perfil(Perfil perfil)
         {
@@ -128,14 +126,11 @@ namespace ecommerce.Controllers
             if (usuarioL == null)
                 return RedirectToAction("Index", "Home");
 
-            // Remove máscara antes da validação
             perfil.CPF = new string(perfil.CPF.Where(char.IsDigit).ToArray());
             perfil.Telefone = new string(perfil.Telefone.Where(char.IsDigit).ToArray());
 
-            // Limpa ModelState antigo para evitar erros anteriores
             ModelState.Clear();
 
-            // Revalida os campos
             TryValidateModel(perfil);
 
             if (!ModelState.IsValid)
@@ -146,7 +141,6 @@ namespace ecommerce.Controllers
             }
 
 
-            // Atualiza campos permitidos
             usuarioL.Nome = perfil.Nome;
             usuarioL.Email = perfil.Email;
             usuarioL.Telefone = perfil.Telefone;
@@ -154,7 +148,7 @@ namespace ecommerce.Controllers
 
             var sucesso = await _usuarioRepository.AtualizarPerfil(usuarioL);
 
-            ModelState.Clear(); // limpa erros antigos
+            ModelState.Clear(); 
 
             if (sucesso)
                 ViewBag.SuccessMessage = "Perfil atualizado com sucesso!";

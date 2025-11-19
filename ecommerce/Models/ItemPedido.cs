@@ -8,7 +8,6 @@
         public int Quantidade { get; set; }
         public decimal PrecoUnitario { get; set; }
 
-        // Navegação
         public Pedido? Pedido { get; set; }
         public Produto? Produto { get; set; }
         public ProdutoImagem? Imagem { get; set; }

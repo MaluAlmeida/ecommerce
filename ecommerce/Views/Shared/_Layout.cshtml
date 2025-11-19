@@ -95,7 +95,6 @@
             }
         }
 
-        // Função auxiliar para obter o carrinho a partir do cookie
         function obterCarrinhoDeCompras() {
             const nomeCookie = "shopping_cart";
             let cookies = document.cookie.split(';');
@@ -116,14 +115,16 @@
             return {};
         }
 
+        #CartSize { display: none!important; }
+
+
     </script>
-@* === HEADER / NAV === *@
 <header>
     <style>
-        /* Paleta e tipografia (use uma serif elegante caso não tenha a fonte do logotipo) */
+        
         :root {
-            --bg-parchment: #F5EFE1; /* bege claro do print */
-            --ink: #111;            /* quase preto */
+            --bg-parchment: #F5EFE1; 
+            --ink: #111;           
             --muted-ink: #4A4A4A;
         }
         .antq-header { background: var(--bg-parchment); }
@@ -144,13 +145,17 @@
                     border-radius: 0;
                 }
 
+            #CartSize {
+                display: none !important;
+            }
+
+
                 .antq-cats .nav-link:hover {
                     color: #ffffff;
                 }
-        /* Aba ativa (como o retângulo preto no print) */
         .antq-cats .nav-link.active { background: #0A0A0A; color: #fff; padding: .6rem 1.5rem; border-radius: 0; }
 
-        /* Utilidades */
+
         .antq-center { display: flex; align-items: center; justify-content: center; }
         .antq-spread { display:flex; align-items:center; justify-content:space-between; }
         .antq-container { max-width: 1100px; margin-inline: auto; padding-inline: 16px; }
@@ -161,10 +166,9 @@
         }
     </style>
 
-    <!-- Linha superior: logo no centro + ícones à direita -->
     <div class="antq-topbar py-2">
         <div class="antq-container antq-spread">
-            <div style="width: 80px"></div> <!-- placeholder para equilibrar o centro -->
+            <div style="width: 80px"></div>
 
             <a class="brand text-decoration-none text-center" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/img/logopreta.png" width="300">
@@ -174,28 +178,26 @@
                 <li class="nav-item me-3">
                     <a class="nav-link" asp-area="" asp-controller="Carrinho" asp-action="Index">
                         <img src="~/img/caricon.png" alt="Carrinho"/>
-                        <span id="CartSize" class="antq-badge">0</span>
+                      
                     </a>
                 </li>
 
                     @{
                         var nome = Context.Session.GetString("UsuarioNome");
                         var sobrenome = Context.Session.GetString("UsuarioSobrenome");
-                        var tipo = Context.Session.GetString("UsuarioTipo"); // "admin" ou "user"
+                        var tipo = Context.Session.GetString("UsuarioTipo"); 
                         bool logado = !string.IsNullOrEmpty(nome);
                         bool isAdmin = string.Equals(tipo, "admin", StringComparison.OrdinalIgnoreCase);
                     }
                     <li class="nav-item">
                         @if (!logado)
                         {
-                            <!-- Não logado: clica e vai para Login (sem dropdown) -->
                             <a class="nav-link" asp-controller="Usuario" asp-action="Login" title="Entrar">
                                 <img src="~/img/usericon.png" height="24" alt="Usuário" />
                             </a>
                         }
                         else
                         {
-                            <!-- Logado: ícone abre dropdown com itens diferentes p/ Admin x Usuário -->
                             <a class="nav-link dropdown-toggle no-caret" href="#" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false" title="Minha conta">
                                 <img src="~/img/usericon.png" height="24" alt="Usuário" />
@@ -225,12 +227,10 @@
         </div>
     </div>
 
-    <!-- Linha inferior: categorias -->
     <nav class="antq-cats">
         <div class="antq-container antq-center ">
 
                 <ul class="navbar-nav mx-auto flex-row gap-4">
-                    <!-- <- adicione flex-row -->
                     <li class="nav-item"><a class="nav-link px-3" href="#roupas">ROUPAS</a></li>
                     <li class="nav-item"><a class="nav-link px-3" href="#arte">ARTE</a></li>
                     <li class="nav-item"><a class="nav-link px-3" href="#moveis">MÓVEIS</a></li>
@@ -258,7 +258,6 @@
 
     <footer class="footer">
         <style>
-            /* Cores base do rodapé */
             .footer, .footer-bottom {
                 background-color: #856045;
                 color: #000;
@@ -273,12 +272,11 @@
                     text-decoration: none;
                 }
 
-            /* Linha dos ícones sociais (usa o seu id #redes) */
             #redes {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                gap: 18px; /* espaçamento entre os ícones */
+                gap: 18px; 
                 margin-bottom: 16px;
             }
 
@@ -288,19 +286,17 @@
                     display: block;
                 }
 
-            /* Bloco de contato (usa o seu id #cont) */
             #cont {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 12px; /* espaço vertical entre as linhas */
+                gap: 12px;
                 margin-bottom: 18px;
             }
-            /* Cada linha: ícone + texto ao lado */
             .contact-line {
                 display: flex;
                 align-items: center;
-                gap: 10px; /* espaço entre ícone e texto */
+                gap: 10px;
             }
 
                 .contact-line img {
@@ -320,14 +316,14 @@
             }
         </style>
 
-        <!-- Ícones sociais -->
+        <!-- Ícones das redes sociais -->
         <div id="redes">
             <a href="https://wa.me/55XXXXXXXXXX" target="_blank" aria-label="WhatsApp"><img src="~/img/whatsapp.png" alt="WhatsApp" /></a>
             <a href="https://www.instagram.com/horizonys_/" target="_blank" aria-label="Instagram"><img src="~/img/instagram.png" alt="Instagram" /></a>
             <a href="https://www.linkedin.com/in/horizonys-enterprise-80244a358/" target="_blank" aria-label="LinkedIn"><img src="~/img/linkedin.png" alt="LinkedIn" /></a>
         </div>
 
-        <!-- Contatos: ícone + texto ao lado -->
+        <!-- Contatos -->
         <div id="cont">
             <div class="contact-line">
                 <img src="~/img/email.png" alt="E-mail" />
@@ -340,7 +336,7 @@
         </div>
 
         <div class="footer-bottom">
-            &copy; 2025 Horizonys. Todos os direitos reservados.
+            &copy; 2025 Antiquário D'Ouro. Todos os direitos reservados.
         </div>
     </footer>
 

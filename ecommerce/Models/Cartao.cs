@@ -12,7 +12,6 @@
         public string Validade { get; set; } = string.Empty;
         public string CVV { get; set; } = string.Empty;
 
-        // Navegação
         public Usuario? Usuario { get; set; }
     }
 }

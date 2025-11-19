@@ -9,7 +9,6 @@
     <hr class="pix-rule" />
 
     <div class="pix-grid">
-        <!-- LADO ESQUERDO -->
         <section class="pix-left">
             <div class="pix-expires">
                 <span>ESTE CÓDIGO VENCE EM :</span>
@@ -27,7 +26,6 @@
             </button>
         </section>
 
-        <!-- LADO DIREITO (RESUMO DO PEDIDO) -->
         <aside class="pix-right">
             <div class="order-card">
                 <div class="order-title">PEDIDO</div>
@@ -66,7 +64,6 @@ function copiarPix(e, codigo){
   setTimeout(()=>{ btn.textContent = "COPIAR CÓDIGO"; btn.classList.remove("pix-btn-ok"); }, 1800);
 }
 
-// contador 30:00
 let tempoRestante = 30*60;
 const contador = document.getElementById("contador");
 const btnCopiar = document.getElementById("btnCopiarPix");

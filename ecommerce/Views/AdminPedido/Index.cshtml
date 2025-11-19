@@ -29,11 +29,10 @@
                     @foreach (var pedido in Model)
                     {
                         var cliente = pedido.Usuario?.Nome ?? "—";
-                        // Exibir o primeiro item (ou adapte para somar/concatenar)
                         var item = pedido.Itens?.FirstOrDefault();
                         var prodNome = item?.Produto?.Nome ?? "—";
                         var categoria = item?.Produto?.Categoria ?? "—";
-                        var preco = pedido.ValorTotal; // ou item?.Preco ?? 0m;
+                        var preco = pedido.ValorTotal;
                         var tipoPag = pedido.MetodoPagamento?.Descricao ?? "—";
                         var status = (pedido.DataPagamento > DateTime.MinValue) ? "PAGO" : "PENDENTE";
                         <tr>
@@ -69,10 +68,10 @@
 @section Styles {
     <style>
         :root{
-          --bg-parchment:#F3EDE1;   /* fundo da página */
-          --card:#F1E8D7;           /* cartão da lista */
+          --bg-parchment:#F3EDE1;  
+          --card:#F1E8D7;           
           --ink:#1a1a1a;
-          --accent:#8a5f43;         /* marrom dos botões */
+          --accent:#8a5f43;
           --radius:18px;
           --shadow:0 8px 18px rgba(0,0,0,.12);
         }

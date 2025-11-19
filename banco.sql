@@ -1,4 +1,4 @@
--- drop database dbEcommerce;
+
 create database dbEcommerce;
 use dbEcommerce;
 

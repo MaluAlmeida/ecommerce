@@ -7,9 +7,6 @@ namespace ecommerce.Services
 {
     public static class AuxiliarCarrinho
     {
-        /// <summary>
-        /// Lê o cookie "shopping_cart" e retorna um dicionário com os produtos e suas quantidades.
-        /// </summary>
         public static async Task<List<ItemPedido>> ObterItensCarrinho(HttpRequest requisicao, HttpResponse resposta, IProdutoRepository produtoRepository)
         {
             var itens = new List<ItemPedido>();
@@ -33,9 +30,7 @@ namespace ecommerce.Services
             return itens;
         }
 
-        /// <summary>
-        /// Retorna o total de itens no carrinho.
-        /// </summary>
+
         public static int ObterTamanhoCarrinho(HttpRequest requisicao, HttpResponse resposta)
         {
             int tamanho = 0;
@@ -49,9 +44,6 @@ namespace ecommerce.Services
             return tamanho;
         }
 
-        /// <summary>
-        /// Calcula o subtotal do carrinho.
-        /// </summary>
         public static decimal ObterSubtotal(List<ItemPedido> itensCarrinho)
         {
             decimal subtotal = 0;
@@ -64,9 +56,6 @@ namespace ecommerce.Services
             return subtotal;
         }
 
-        /// <summary>
-        /// Salva o estado atual do carrinho no cookie (JSON + Base64).
-        /// </summary>
         public static void SalvarCarrinho(HttpResponse resposta, Dictionary<int, int> carrinho)
         {
             string json = JsonConvert.SerializeObject(carrinho);
@@ -83,9 +72,6 @@ namespace ecommerce.Services
             resposta.Cookies.Append("shopping_cart", valorBase64, opcoes);
         }
 
-        /// <summary>
-        /// Adiciona um item ao carrinho (ou incrementa se já existir).
-        /// </summary>
         public static void AdicionarAoCarrinho(HttpRequest requisicao, HttpResponse resposta, int produtoId)
         {
             var carrinho = ObterDicionarioCarrinho(requisicao, resposta);
@@ -116,9 +102,7 @@ namespace ecommerce.Services
             SalvarCarrinho(resposta, carrinho);
         }
 
-        /// <summary>
-        /// Remove completamente um produto do carrinho.
-        /// </summary>
+
         public static void RemoverDoCarrinho(HttpRequest requisicao, HttpResponse resposta, int produtoId)
         {
             var carrinho = ObterDicionarioCarrinho(requisicao, resposta);
@@ -129,10 +113,6 @@ namespace ecommerce.Services
                 SalvarCarrinho(resposta, carrinho);
             }
         }
-
-        /// <summary>
-        /// Recupera o cookie e converte de Base64 + JSON para dicionário de produtos.
-        /// </summary>
         private static Dictionary<int, int> ObterDicionarioCarrinho(HttpRequest requisicao, HttpResponse resposta)
         {
             try
@@ -143,7 +123,6 @@ namespace ecommerce.Services
                     return new Dictionary<int, int>();
                 }
 
-                // Decodifica de Base64 e depois desserializa de JSON
                 string json = Encoding.UTF8.GetString(Convert.FromBase64String(valorBase64));
                 var dicionario = JsonConvert.DeserializeObject<Dictionary<int, int>>(json);
 

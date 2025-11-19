@@ -25,7 +25,6 @@ namespace ecommerce.Controllers
                     return RedirectToAction("Index", "Home");
                 }
 
-                // Busca pedidos do usuário via repository
                 var pedidos = await _pedidoRepository.ObterPedidosDoUsuario(usuarioId);
 
                 if (pagIndex < 1) pagIndex = 1;
@@ -34,7 +33,6 @@ namespace ecommerce.Controllers
                 int count = pedidos.Count();
                 int totalPag = (int)Math.Ceiling((decimal)count / pagTam);
 
-                // Garantir que a página atual não ultrapasse o total de páginas (ou seja 1 se não houver registros)
                 if (totalPag == 0) totalPag = 1;
                 if (pagIndex > totalPag) pagIndex = totalPag;
 
