@@ -227,18 +227,25 @@
         </div>
     </div>
 
-    <nav class="antq-cats">
-        <div class="antq-container antq-center ">
-
+        <nav class="antq-cats">
+            <div class="antq-container antq-center">
                 <ul class="navbar-nav mx-auto flex-row gap-4">
-                    <li class="nav-item"><a class="nav-link px-3" href="#roupas">ROUPAS</a></li>
-                    <li class="nav-item"><a class="nav-link px-3" href="#arte">ARTE</a></li>
-                    <li class="nav-item"><a class="nav-link px-3" href="#moveis">MÓVEIS</a></li>
-                    <li class="nav-item"><a class="nav-link px-3" href="#joias">JÓIAS</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" asp-controller="Home" asp-action="Index" asp-fragment="roupas">ROUPAS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" asp-controller="Home" asp-action="Index" asp-fragment="arte">ARTE</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" asp-controller="Home" asp-action="Index" asp-fragment="moveis">MÓVEIS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" asp-controller="Home" asp-action="Index" asp-fragment="joias">JÓIAS</a>
+                    </li>
                 </ul>
+            </div>
+        </nav>
 
-        </div>
-    </nav>
 </header>
 
 

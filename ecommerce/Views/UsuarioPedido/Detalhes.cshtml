@@ -1,113 +1,281 @@
 ﻿@model ecommerce.Models.Pedido
 
 @{
-    string paymentBadgeColor = "bg-danger";
-    if (Model.StatusPagamento == "Pendente") paymentBadgeColor = "bg-warning text-dark";
-    else if (Model.StatusPagamento == "Pago") paymentBadgeColor = "bg-success";
-    else if (Model.StatusPagamento == "Cancelado") paymentBadgeColor = "bg-secondary";
+    string paymentBadgeColor = Model.StatusPagamento switch
+    {
+        "Pago" => "badge-soft-success",
+        "Pendente" => "badge-soft-warning",
+        "Cancelado" => "badge-soft-secondary",
+        _ => "badge-soft-secondary"
+    };
 
-    string orderBadgeColor = "bg-danger";
-    if (Model.StatusPedido == "Criado") orderBadgeColor = "bg-warning text-dark";
-    else if (Model.StatusPedido == "Aceito") orderBadgeColor = "bg-success";
-    else if (Model.StatusPedido == "Cancelado") orderBadgeColor = "bg-secondary";
+    string orderBadgeColor = Model.StatusPedido switch
+    {
+        "Aceito" => "badge-soft-success",
+        "Criado" => "badge-soft-warning",
+        "Cancelado" => "badge-soft-secondary",
+        _ => "badge-soft-secondary"
+    };
+
+    decimal subtotal = Model?.Itens?.Sum(i => i.PrecoUnitario * i.Quantidade) ?? 0m;
 }
 
-<h3 class="text-center mb-4">Detalhes do Pedido</h3>
-
-<a class="btn btn-link" asp-controller="UsuarioPedido" asp-action="Index">Voltar para Pedidos</a>
-
-<div class="row mb-4">
-    <div class="col">
-        <div class="border rounded py-3 px-4 h-100">
-            <h3 class="mb-4">Pedido</h3>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">ID do Pedido</div>
-                <div class="col">@Model.Id</div>
-            </div>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Endereço de Entrega</div>
-                <div class="col">
-                    @(Model.Endereco != null ? $"{Model.Endereco.NomeCompleto}, {Model.Endereco.Logradouro}, {Model.Endereco.Numero}" : "Desconhecido")
-                </div>
-            </div>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Método de Pagamento</div>
-                <div class="col">
-                    @(Model.MetodoPagamento != null ? Model.MetodoPagamento.Descricao : "Desconhecido")
-                </div>
-            </div>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Status do Pagamento</div>
-                <div class="col">
-                    <span class="badge rounded-pill @paymentBadgeColor">@Model.StatusPagamento</span>
-                </div>
-            </div>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Status do Pagamento</div>
-                <div class="col">
-                    <span class="badge rounded-pill @orderBadgeColor">@Model.StatusPedido</span>
-                </div>
-            </div>
-
-            <div class="row mb-2">
-                <div class="col">Data do Pedido</div>
-                <div class="col">@Model.DataPedido.ToString("dd/MM/yyyy")</div>
-            </div>
-        </div>
-    </div>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Produto</th>
-            <th>Categoria</th>
-            <th>Quantidade</th>
-            <th>Preço Unitário</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        @{
-            decimal subtotal = 0;
-            if (Model.Itens != null)
-            {
-                foreach (var item in Model.Itens)
-                {
-                    decimal itemTotal = item.PrecoUnitario * item.Quantidade;
-                    subtotal += itemTotal;
-                    <tr>
-                        <td>
-                                <img src="@Url.Content("~/img/" + item.Produto.Imagens.FirstOrDefault()?.Url)" width="100" />
-                            @item.Produto.Nome
-                        </td>
-                        <td>@item.Produto.Categoria</td>
-                        <td>@item.Quantidade</td>
-                        <td>@item.PrecoUnitario.ToString("F2")</td>
-                        <td>@itemTotal.ToString("F2")</td>
-                    </tr>
-                }
-            }
+@section Styles {
+    <style>
+        :root {
+            --bg: #F5EEDF;
+            --panel: #F3E8D7;
+            --ink: #2b2b2b;
+            --muted: #7a6f66;
+            --pill: #8a5f43;
+            --pill-dark: #6f4a36;
+            --radius: 16px;
+            --shadow: 0 10px 22px rgba(0,0,0,.12);
         }
-    </tbody>
-</table>
-</div>
 
-    <div class="ms-auto mb-3" style="width: 300px">
-        <div class="row">
-            <div class="col fw-bold">Subtotal:</div>
-            <div class="col text-end">@subtotal</div>
+        .order-wrap {
+            background: var(--bg);
+            padding: 24px 14px;
+            border-radius: var(--radius);
+        }
+
+        .order-card {
+            background: var(--panel);
+            border: 1px solid rgba(0,0,0,.06);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .order-title {
+            font-family: "Cinzel","Cormorant Garamond",Georgia,serif;
+            letter-spacing: .1rem;
+            color: var(--ink);
+        }
+
+        .order-meta .row {
+            padding: .5rem 0;
+            border-bottom: 1px dashed rgba(0,0,0,.08);
+        }
+
+            .order-meta .row:last-child {
+                border-bottom: 0;
+            }
+
+        .tbl {
+            --bs-table-bg: transparent;
+        }
+
+            .tbl thead th {
+                font-family: "Cinzel","Cormorant Garamond",serif;
+                color: var(--ink);
+                letter-spacing: .08rem;
+                border-bottom: 1px solid rgba(0,0,0,.12);
+                padding: .9rem .75rem;
+            }
+
+            .tbl tbody tr {
+                background: #fff8;
+                border-radius: 12px;
+            }
+
+            .tbl tbody td {
+                padding: .9rem .75rem;
+                vertical-align: middle;
+                border-bottom: 8px solid transparent;
+            }
+
+        .item-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+            margin-right: 10px;
+        }
+
+        .badge-soft-success {
+            background: #e6f4ea;
+            color: #1e7b35;
+            border: 1px solid #cfe9d7;
+        }
+
+        .badge-soft-warning {
+            background: #fff4e0;
+            color: #6b4d18;
+            border: 1px solid #ffe3b3;
+        }
+
+        .badge-soft-secondary {
+            background: #eee;
+            color: #444;
+            border: 1px solid #ddd;
+        }
+
+        .badge.rounded-pill {
+            padding: .45rem .9rem;
+            font-weight: 600;
+        }
+
+        .btn-capsule {
+            background: var(--pill);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: .55rem 1.1rem;
+            font-weight: 600;
+            box-shadow: 0 6px 18px rgba(0,0,0,.08);
+        }
+
+            .btn-capsule:hover {
+                background: var(--pill-dark);
+                color: #fff;
+            }
+
+        .totals {
+            width: min(360px,100%);
+            background: #fff;
+            border: 1px solid rgba(0,0,0,.08);
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: var(--shadow);
+        }
+
+            .totals .row {
+                margin: 0;
+                padding: .35rem 0;
+                color: var(--ink);
+            }
+
+                .totals .row:last-child .col:first-child {
+                    font-weight: 800;
+                }
+    </style>
+}
+
+<div class="order-wrap">
+    <div class="container px-2 px-md-3">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="order-title m-0">Detalhes do Pedido</h3>
+            <a class="btn btn-capsule" asp-controller="UsuarioPedido" asp-action="Index">Voltar para pedidos</a>
         </div>
-        <div class="row">
-            <div class="col fw-bold">Taxa de Entrega:</div>
-            <div class="col text-end">@Model.TaxaEntrega</div>
-        </div>
-        <div class="row">
-            <div class="col fw-bold">Total:</div>
-            <div class="col text-end">@Model.ValorTotal</div>
+
+        <div class="row g-3 align-items-start">
+            <!-- ESQUERDA -->
+            <div class="col-12 col-lg-7">
+                <div class="order-card p-3 p-md-4 mb-3">
+                    <h5 class="mb-3">Pedido</h5>
+                    <div class="order-meta">
+                        <div class="row">
+                            <div class="col-6 text-muted">ID do Pedido</div>
+                            <div class="col-6 text-end">@Model.Id</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 text-muted">Endereço de Entrega</div>
+                            <div class="col-6 text-end">
+                                @(Model.Endereco != null
+                                    ? $"{Model.Endereco.NomeCompleto}, {Model.Endereco.Logradouro}, {Model.Endereco.Numero}"
+                                    : "Desconhecido")
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 text-muted">Método de Pagamento</div>
+                            <div class="col-6 text-end">@(Model.MetodoPagamento?.Descricao ?? "Desconhecido")</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 text-muted">Status do Pagamento</div>
+                            <div class="col-6 text-end">
+                                <span class="badge rounded-pill @paymentBadgeColor">@Model.StatusPagamento</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 text-muted">Status do Pedido</div>
+                            <div class="col-6 text-end">
+                                <span class="badge rounded-pill @orderBadgeColor">@Model.StatusPedido</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 text-muted">Data do Pedido</div>
+                            <div class="col-6 text-end">@Model.DataPedido.ToString("dd/MM/yyyy")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-card p-3 p-md-4">
+                    <h5 class="mb-3">Itens</h5>
+                    <table class="table tbl">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th class="text-center">Categoria</th>
+                                <th class="text-center">Qtd</th>
+                                <th class="text-end">Preço</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model?.Itens != null && Model.Itens.Any())
+                            {
+                                foreach (var item in Model.Itens)
+                                {
+                                    var img = item?.Produto?.Imagens?.FirstOrDefault()?.Url ?? "placeholder.png";
+                                    var itemTotal = item.PrecoUnitario * item.Quantidade;
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img class="item-thumb" src="@Url.Content("~/img/" + img)" alt="@item.Produto?.Nome" />
+                                                <div>@(item?.Produto?.Nome ?? "—")</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">@(item?.Produto?.Categoria ?? "—")</td>
+                                        <td class="text-center">@item.Quantidade</td>
+                                        <td class="text-end">R$ @item.PrecoUnitario.ToString("N2")</td>
+                                        <td class="text-end">R$ @itemTotal.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="5" class="text-center text-muted py-4">Nenhum item neste pedido.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- DIREITA (RESUMO / TOTAIS) -->
+            <div class="col-12 col-lg-5">
+                <div class="order-card p-3 p-md-4 mb-3">
+                    <h5 class="mb-3">Resumo</h5>
+
+                    <div class="totals">
+                        <div class="row">
+                            <div class="col">Subtotal</div>
+                            <div class="col text-end">R$ @subtotal.ToString("N2")</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Taxa de Entrega</div>
+                            <div class="col text-end">R$ @Model.TaxaEntrega.ToString("N2")</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Total</div>
+                            <div class="col text-end">R$ @Model.ValorTotal.ToString("N2")</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 d-grid gap-2">
+                        <a class="btn btn-capsule" asp-controller="UsuarioPedido" asp-action="Index">Ver outros pedidos</a>
+                    </div>
+                </div>
+
+                <div class="order-card p-3 p-md-4">
+                    <h5 class="mb-3">Informações</h5>
+                    <div class="small text-muted">
+                        O status do pedido e do pagamento pode levar alguns minutos para atualizar.
+                        Guarde o número do pedido: <strong>#@Model.Id</strong>.
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
