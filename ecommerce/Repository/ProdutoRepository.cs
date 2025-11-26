@@ -21,7 +21,7 @@ namespace ecommerce.Repository
 
             var sql = @"
 SELECT 
-    p.Id, p.Nome, p.Categoria,  p.Descricao, p.EstadoConservacao, p.Preco,  p.DataCriada,
+    p.Id, p.Nome, p.Categoria,  p.Descricao, p.EstadoConservacao, p.Preco,  p.DataPedido,
     pi.Id AS ImagemId, pi.ProdutoId AS ImagemProdutoId, pi.Url, pi.OrdemImagem
 FROM produtos p
 LEFT JOIN produtoImagens pi ON pi.ProdutoId = p.Id
@@ -68,7 +68,7 @@ ORDER BY p.Id, pi.OrdemImagem;
 
             var sql = @"
 SELECT 
-    p.Id, p.Nome, p.Categoria,  p.Descricao, p.EstadoConservacao, p.Preco,  p.DataCriada,
+    p.Id, p.Nome, p.Categoria,  p.Descricao, p.EstadoConservacao, p.Preco,  p.DataPedido,
     pi.Id AS ImagemId, pi.ProdutoId AS ImagemProdutoId, pi.Url, pi.OrdemImagem
 FROM produtos p
 LEFT JOIN produtoImagens pi ON pi.ProdutoId = p.Id
@@ -120,7 +120,7 @@ ORDER BY p.Id DESC, pi.OrdemImagem;
             {
                 // Inserir produto 
                 var sqlProduto = @"
-            INSERT INTO Produtos (Nome, Categoria, Descricao, Preco, EstadoConservacao, DataCriada)
+            INSERT INTO Produtos (Nome, Categoria, Descricao, Preco, EstadoConservacao, DataPedido)
             VALUES (@Nome, @Categoria, @Descricao, @Preco, @EstadoConservacao, @DataCriada);
             SELECT LAST_INSERT_ID();";
 

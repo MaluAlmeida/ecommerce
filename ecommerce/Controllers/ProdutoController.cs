@@ -43,7 +43,7 @@ namespace ecommerce.Controllers
                 "Preco" => ordPor == "asc" ? produtos.OrderBy(p => p.Preco).ToList() : produtos.OrderByDescending(p => p.Preco).ToList(),
                 "Descricao" => ordPor == "asc" ? produtos.OrderBy(p => p.Descricao).ToList() : produtos.OrderByDescending(p => p.Descricao).ToList(),
                 "EstadoConservacao" => ordPor == "asc" ? produtos.OrderBy(p => p.EstadoConservacao).ToList() : produtos.OrderByDescending(p => p.EstadoConservacao).ToList(),
-                "DataCriada" => ordPor == "asc" ? produtos.OrderBy(p => p.DataCriada).ToList() : produtos.OrderByDescending(p => p.DataCriada).ToList(),
+                "DataPedido" => ordPor == "asc" ? produtos.OrderBy(p => p.DataCriada).ToList() : produtos.OrderByDescending(p => p.DataCriada).ToList(),
                 _ => ordPor == "asc" ? produtos.OrderBy(p => p.Id).ToList() : produtos.OrderByDescending(p => p.Id).ToList(),
             };
 

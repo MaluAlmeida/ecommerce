@@ -26,9 +26,8 @@ namespace ecommerce.Repository
                 return null;
 
             var sql = @"
-            INSERT INTO usuarios 
-            (Nome, Sobrenome, Email, Senha, CPF, Telefone, Tipo)
-            VALUES (@Nome, @Sobrenome, @Email, @Senha, @CPF, @Telefone, @Tipo);
+            INSERT INTO usuarios(Nome, DataNasc, Email, Senha, CPF, Telefone, Tipo)
+            VALUES (@Nome, @DataNasc, @Email, @Senha, @CPF, @Telefone, @Tipo);
             SELECT LAST_INSERT_ID();";
 
             var idGerado = await connection.ExecuteScalarAsync<int>(sql, usuario);

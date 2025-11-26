@@ -175,7 +175,7 @@
             }
 
         .thumb-box {
-            background: #fff;
+            background: #F5EFE1;
             border-radius: 12px;
             overflow: hidden;
             display: grid;
@@ -214,9 +214,15 @@
             margin-top: 8px;
             font-weight: 700;
             width: max-content;
-            background: #fff;
+            background: #F5EFE1;
             padding: 6px 10px;
             border-radius: 8px;
+            position: center;
+
+        }
+
+        .prod {
+           position: center; 
         }
     </style>
 
@@ -241,7 +247,10 @@
                     </div>
 
                     <div class="produto-nome">@produto.Nome</div>
+                   <center> <div class="</div>">
                     <div class="produto-preco">R$ @produto.Preco.ToString("N2")</div>
+                        </div>
+                </center>
                 </div>
             }
         </div>
@@ -269,7 +278,11 @@
                     </div>
 
                     <div class="produto-nome">@produto.Nome</div>
+                    <center>
+                        <div class="prod">
                     <div class="produto-preco">R$ @produto.Preco.ToString("N2")</div>
+                        </div>
+                    </center>
                 </div>
             }
         </div>
@@ -296,7 +309,11 @@
                     </div>
 
                     <div class="produto-nome">@produto.Nome</div>
+                            <center>
+                                <div class="prod">
                     <div class="produto-preco">R$ @produto.Preco.ToString("N2")</div>
+                        </div>
+                    </center>
                 </div>
             }
         </div>
@@ -323,7 +340,11 @@
                     </div>
 
                     <div class="produto-nome">@produto.Nome</div>
+                                    <center>
+                                        <div class="prod">
                     <div class="produto-preco">R$ @produto.Preco.ToString("N2")</div>
+                        </div>
+                    </center>
                 </div>
             }
         </div>
