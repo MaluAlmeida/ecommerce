@@ -1,15 +1,14 @@
-
 create database dbEcommerce;
 use dbEcommerce;
 
-CREATE TABLE produtos(
+CREATE TABLE produtos (
 Id INT PRIMARY KEY AUTO_INCREMENT,
 Nome VARCHAR(100),
 Categoria VARCHAR(70),
 Descricao varchar(500),
 EstadoConservacao VARCHAR(50),
 Preco DECIMAL(10,2),
-DataCriada DATE DEFAULT (CURRENT_DATE)
+DataPedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE produtoImagens (
@@ -79,7 +78,7 @@ CREATE TABLE pedidos (
     TaxaEntrega DECIMAL(10,2) DEFAULT 0.00,
 	StatusPagamento VARCHAR(50) DEFAULT 'Aguardando Pagamento',
 	StatusPedido VARCHAR(50) DEFAULT 'Criado',
-    DataPedido DATETIME DEFAULT CURRENT_TIMESTAMP,
+    DataPedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ValorTotal DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (UsuarioId) REFERENCES usuarios(Id)
         ON DELETE CASCADE ON UPDATE CASCADE,
@@ -152,7 +151,10 @@ INSERT INTO produtoImagens (ProdutoId, Url) VALUES
 (16 , 'anel.png '),
 (17, 'colar.png '),
 (18 , 'esmeralda.png');
+
 select * from produtos;
+select * from  usuarios;
+
 INSERT INTO usuarios(Nome, DataNasc, Email, Senha, CPF, Telefone, Tipo)
 VALUES 
 ('Admin', '12121200','admin@admin.com', '123', '11111111111', '11999999999', 'admin'),
