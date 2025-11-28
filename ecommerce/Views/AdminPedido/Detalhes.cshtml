@@ -2,165 +2,341 @@
 @using ecommerce.Services;
 
 @{
-    // Badge cores
-    string paymentBadgeColor = "bg-danger";
-    if (Model.StatusPagamento == "Pendente") paymentBadgeColor = "bg-warning text-dark";
-    else if (Model.StatusPagamento == "Pago") paymentBadgeColor = "bg-success";
-    else if (Model.StatusPagamento == "Cancelado") paymentBadgeColor = "bg-secondary";
+    string paymentBadgeColor = Model.StatusPagamento switch
+    {
+        "Pago" => "badge-soft-success",
+        "Pendente" => "badge-soft-warning",
+        "Cancelado" => "badge-soft-secondary",
+        _ => "badge-soft-secondary"
+    };
 
-    string orderBadgeColor = "bg-danger";
-    if (Model.StatusPedido == "Criado") orderBadgeColor = "bg-warning text-dark";
-    else if (Model.StatusPedido == "Aceito") orderBadgeColor = "bg-success";
-    else if (Model.StatusPedido == "Cancelado") orderBadgeColor = "bg-secondary";
+    string orderBadgeColor = Model.StatusPedido switch
+    {
+        "Aceito" => "badge-soft-success",
+        "Criado" => "badge-soft-warning",
+        "Cancelado" => "badge-soft-secondary",
+        _ => "badge-soft-secondary"
+    };
+
+    decimal subtotal = Model?.Itens?.Sum(i => i.PrecoUnitario * i.Quantidade) ?? 0m;
 }
 
-<h3 class="text-center mb-4">Detalhes do Pedido</h3>
-
-<a class="btn btn-link" asp-controller="AdminPedido" asp-action="Index">Voltar para Pedidos</a>
-
-<div class="row mb-4">
-    <div class="col-lg-6">
-        <div class="border rounded py-3 px-4 h-100">
-            <h3 class="mb-4">Pedido</h3>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">ID do Pedido</div>
-                <div class="col">@Model.Id</div>
-            </div>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Endereço de Entrega</div>
-                <div class="col">
-                    @(Model.Endereco != null ? $"{Model.Endereco.NomeCompleto}, {Model.Endereco.Logradouro}, {Model.Endereco.Numero}" : "Desconhecido")
-                </div>
-            </div>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Método de Pagamento</div>
-                <div class="col">
-                    @(Model.MetodoPagamento != null ? Model.MetodoPagamento.Descricao : "Desconhecido")
-                </div>
-            </div>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Status do Pagamento</div>
-                <div class="col">
-                    <span class="badge rounded-pill @paymentBadgeColor">@Model.StatusPagamento</span>
-                </div>
-            </div>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Status do Pagamento</div>
-                <div class="col">
-                    <span class="badge rounded-pill @orderBadgeColor">@Model.StatusPedido</span>
-                    <a href="#" class="ms-2 editar-status" data-bs-toggle="modal" data-bs-target="#StatusPedidoModal" data-id="@Model.Id" 
-                       data-status="@Model.StatusPedido">
-                        Editar
-                    </a>
-                </div>
-            </div>
-
-            <div class="row mb-2">
-                <div class="col">Data do Pedido</div>
-                <div class="col">@Model.DataPedido.ToString("dd/MM/yyyy")</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="border rounded py-3 px-4 h-100">
-            <h3 class="mb-4">Cliente</h3>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Nome</div>
-                <div class="col">
-                    @(Model.Usuario != null ? $"{Model.Usuario.Nome} " : "Desconhecido")
-                </div>
-            </div>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Email</div>
-                <div class="col">@Model.Usuario?.Email</div>
-            </div>
-
-            <div class="row mb-2 pb-2 border-bottom">
-                <div class="col">Telefone</div>
-                <div class="col">@Model.Usuario?.Telefone.FormatarTelefone()</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Produto</th>
-            <th>Categoria</th>
-            <th>Quantidade</th>
-            <th>Preço Unitário</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        @{
-            decimal subtotal = 0;
-            if (Model.Itens != null)
-            {
-                foreach (var item in Model.Itens)
-                {
-                    decimal itemTotal = item.PrecoUnitario * item.Quantidade;
-                    subtotal += itemTotal;
-                    <tr>
-                        <td>
-                            <img src="@Url.Content("~/img/" + item.Produto.Imagens.FirstOrDefault()?.Url)" width="100" />
-                        @item.Produto.Nome</td>
-                        <td>@item.Produto.Categoria</td>
-                        <td>@item.Quantidade</td>
-                        <td>@item.PrecoUnitario.ToString("F2")</td>
-                        <td>@itemTotal.ToString("F2")</td>
-                    </tr>
-                }
-            }
+@section Styles {
+    <style>
+        :root {
+            --bg: #F5EEDF; /* parchment */
+            --panel: #F3E8D7; /* cards */
+            --ink: #2b2b2b;
+            --muted: #7a6f66;
+            --pill: #8a5f43; /* botões */
+            --pill-dark: #6f4a36;
+            --radius: 16px;
+            --shadow: 0 12px 28px rgba(0,0,0,.14);
         }
-    </tbody>
-</table>
 
-<div class="ms-auto mb-3" style="width: 300px">
-    <div class="row">
-        <div class="col fw-bold">Subtotal:</div>
-        <div class="col text-end">@subtotal</div>
-    </div>
-    <div class="row">
-        <div class="col fw-bold">Taxa de Entrega:</div>
-        <div class="col text-end">@Model.TaxaEntrega</div>
-    </div>
-    <div class="row">
-        <div class="col fw-bold">Total:</div>
-        <div class="col text-end">@Model.ValorTotal</div>
+        .wrap {
+            background: var(--bg);
+            border-radius: var(--radius);
+            padding: 22px 14px;
+        }
+
+        .card-soft {
+            background: var(--panel);
+            border: 1px solid rgba(0,0,0,.08);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .title {
+            font-family: "Cinzel","Cormorant Garamond",Georgia,serif;
+            letter-spacing: .12rem;
+            color: var(--ink);
+        }
+
+        .kv .k {
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06rem;
+            font-size: .78rem;
+        }
+
+        .kv .row {
+            padding: .55rem 0;
+            border-bottom: 1px dashed rgba(0,0,0,.08);
+        }
+
+            .kv .row:last-child {
+                border-bottom: 0;
+            }
+
+        .badge-soft-success {
+            background: #e6f4ea;
+            color: #1e7b35;
+            border: 1px solid #cfe9d7;
+        }
+
+        .badge-soft-warning {
+            background: #fff4e0;
+            color: #6b4d18;
+            border: 1px solid #ffe3b3;
+        }
+
+        .badge-soft-secondary {
+            background: #eee;
+            color: #444;
+            border: 1px solid #ddd;
+        }
+
+        .badge.rounded-pill {
+            padding: .45rem .9rem;
+            font-weight: 600;
+        }
+
+        .btn-capsule {
+            background: var(--pill);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: .55rem 1.1rem;
+            font-weight: 600;
+        }
+
+            .btn-capsule:hover {
+                background: var(--pill-dark);
+                color: #fff;
+            }
+
+        .link-edit {
+            color: var(--pill);
+            font-weight: 600;
+        }
+
+            .link-edit:hover {
+                color: var(--pill-dark);
+            }
+
+        /* tabela de itens */
+        .tbl {
+            --bs-table-bg: transparent;
+        }
+
+            .tbl thead th {
+                font-family: "Cinzel","Cormorant Garamond",serif;
+                color: var(--ink);
+                letter-spacing: .08rem;
+                border-bottom: 1px solid rgba(0,0,0,.12);
+                padding: .9rem .75rem;
+            }
+
+            .tbl tbody td {
+                padding: .9rem .75rem;
+                vertical-align: middle;
+                border-bottom: 8px solid transparent;
+            }
+
+        .thumb {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+            margin-right: 10px;
+        }
+
+        /* totais */
+        .totals {
+            width: min(360px,100%);
+            background: #fff;
+            border: 1px solid rgba(0,0,0,.08);
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: var(--shadow);
+        }
+
+        /* modal */
+        .soft-modal.modal-content {
+            background: var(--panel);
+            border: 1px solid rgba(0,0,0,.08);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .soft-modal .modal-header {
+            background: var(--bg);
+            border-bottom: 1px solid rgba(0,0,0,.06);
+        }
+
+        .soft-modal .modal-title {
+            font-family: "Cinzel","Cormorant Garamond",Georgia,serif;
+            letter-spacing: .12rem;
+            color: var(--ink);
+        }
+
+        .soft-modal .form-select {
+            border-radius: 12px;
+        }
+    </style>
+}
+
+<div class="wrap">
+    <div class="container px-2 px-md-3">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="title m-0">Detalhes do Pedido</h3>
+            <a class="btn btn-capsule" asp-controller="AdminPedido" asp-action="Index">Voltar para pedidos</a>
+        </div>
+
+        <div class="row g-3 mb-2">
+            <!-- Pedido -->
+            <div class="col-12 col-lg-6">
+                <div class="card-soft p-3 p-md-4 h-100">
+                    <h5 class="mb-3">Pedido</h5>
+                    <div class="kv">
+                        <div class="row"><div class="col-5 k">ID do Pedido</div><div class="col-7">@Model.Id</div></div>
+                        <div class="row">
+                            <div class="col-5 k">Endereço de entrega</div>
+                            <div class="col-7">
+                                @(Model.Endereco != null ? $"{Model.Endereco.NomeCompleto}, {Model.Endereco.Logradouro}, {Model.Endereco.Numero}" : "Desconhecido")
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5 k">Método de pagamento</div>
+                            <div class="col-7">@(Model.MetodoPagamento != null ? Model.MetodoPagamento.Descricao : "Desconhecido")</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5 k">Status do pagamento</div>
+                            <div class="col-7"><span class="badge rounded-pill @paymentBadgeColor">@Model.StatusPagamento</span></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5 k">Status do pedido</div>
+                            <div class="col-7">
+                                <span class="badge rounded-pill @orderBadgeColor">@Model.StatusPedido</span>
+                                <a href="#" class="ms-2 link-edit editar-status"
+                                   data-bs-toggle="modal" data-bs-target="#StatusPedidoModal"
+                                   data-id="@Model.Id" data-status="@Model.StatusPedido">Editar</a>
+                            </div>
+                        </div>
+                        <div class="row"><div class="col-5 k">Data do pedido</div><div class="col-7">@Model.DataPedido.ToString("dd/MM/yyyy")</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cliente -->
+            <div class="col-12 col-lg-6">
+                <div class="card-soft p-3 p-md-4 h-100">
+                    <h5 class="mb-3">Cliente</h5>
+                    <div class="kv">
+                        <div class="row"><div class="col-5 k">Nome</div><div class="col-7">@(Model.Usuario != null ? $"{Model.Usuario.Nome}" : "Desconhecido")</div></div>
+                        <div class="row"><div class="col-5 k">E-mail</div><div class="col-7">@Model.Usuario?.Email</div></div>
+                        <div class="row"><div class="col-5 k">Telefone</div><div class="col-7">@Model.Usuario?.Telefone.FormatarTelefone()</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Itens -->
+        <div class="card-soft p-2 p-md-3 mb-3">
+            <div class="table-responsive">
+                <table class="table tbl align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th class="text-center">Categoria</th>
+                            <th class="text-center">Qtd</th>
+                            <th class="text-end">Preço unit.</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.Itens != null && Model.Itens.Any())
+                        {
+                            foreach (var item in Model.Itens)
+                            {
+                                var img = item?.Produto?.Imagens?.FirstOrDefault()?.Url ?? "placeholder.png";
+                                var itemTotal = item.PrecoUnitario * item.Quantidade;
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img class="thumb" src="@Url.Content("~/img/" + img)" alt="@item.Produto?.Nome" />
+                                            <div>
+                                                <div class="fw-semibold">@item.Produto?.Nome</div>
+                                                <small class="text-muted">ID: @item.ProdutoId</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">@item.Produto?.Categoria</td>
+                                    <td class="text-center">@item.Quantidade</td>
+                                    <td class="text-end">R$ @item.PrecoUnitario.ToString("N2")</td>
+                                    <td class="text-end">R$ @itemTotal.ToString("N2")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="5" class="text-center text-muted py-4">Nenhum item neste pedido.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Totais -->
+        <div class="ms-auto totals">
+            <div class="row">
+                <div class="col fw-bold">Subtotal:</div>
+                <div class="col text-end">R$ @subtotal.ToString("N2")</div>
+            </div>
+            <div class="row">
+                <div class="col fw-bold">Taxa de entrega:</div>
+                <div class="col text-end">R$ @Model.TaxaEntrega.ToString("N2")</div>
+            </div>
+            <div class="row">
+                <div class="col fw-bold">Total:</div>
+                <div class="col text-end">R$ @Model.ValorTotal.ToString("N2")</div>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- MODAL Editar Status -->
 <div class="modal fade" id="StatusPedidoModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content soft-modal">
             <div class="modal-header">
-                <h1 class="modal-title fs-5">Atualizar Status do Pedido</h1>
+                <h5 class="modal-title">Atualizar Status do Pedido</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
 
-            <form method="post" asp-controller="AdminPedido" asp-action="Editar">
-                <input type="hidden" name="id" id="pedidoId" value="@Model.Id" />
-                <select name="status_Pedido" id="status_Pedido" class="form-select">
-                    <option value="Criado">Criado</option>
-                    <option value="Aceito">Aceito</option>
-                    <option value="Cancelado">Cancelado</option>
-                </select>
+            <form method="post" asp-controller="AdminPedido" asp-action="Editar" class="p-2 pt-0">
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="pedidoId" value="@Model.Id" />
+                    <label class="form-label">Status</label>
+                    <select name="status_Pedido" id="status_Pedido" class="form-select">
+                        <option value="Criado">Criado</option>
+                        <option value="Aceito">Aceito</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-capsule">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Preenche a modal com o status atual
+        document.querySelectorAll('.editar-status').forEach(el=>{
+          el.addEventListener('click', e=>{
+            const id = el.getAttribute('data-id');
+            const status = el.getAttribute('data-status');
+            document.getElementById('pedidoId').value = id;
+            const sel = document.getElementById('status_Pedido');
+            if(sel && status) sel.value = status;
+          });
+        });
+    </script>
+}
